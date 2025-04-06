@@ -704,4 +704,1094 @@ for(region in regions) {
             <p><strong>Write the R code to:</strong></p>
             <ol>
                 <li>Create a proper time series object from the monthly malaria data.</li>
-                <li
+                <li>Decompose the time series into trend, seasonal, and random components.</li>
+                <li>Create a visualization highlighting the seasonal pattern of malaria cases.</li>
+                <li>Compare the actual cases with the values predicted by the decomposition.</li>
+            </ol>
+            
+        </div>
+        
+        <div class="exercise-section">
+            <h2 id="ex-incidence">3️⃣ Computing Incidence Rates</h2>
+            
+            <h3>Exercise 3.1: Basic Incidence Calculation</h3>
+            <p>🔹 <strong>Calculate incidence rates for different time periods and regions.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Calculate the annual malaria incidence rate per 1000 people across all regions.</li>
+                <li>Calculate incidence rates for each region by year.</li>
+                <li>Create a visualization showing the trend in incidence rates over time.</li>
+                <li>Identify the regions with the highest and lowest incidence rates.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 3.2: Demographic-Specific Incidence</h3>
+            <p>🔹 <strong>Calculate incidence rates for different demographic groups.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Calculate age-specific incidence rates if age data is available.</li>
+                <li>Calculate gender-specific incidence rates if gender data is available.</li>
+                <li>Create a visualization comparing incidence rates across different demographic groups.</li>
+                <li>Identify which demographic groups have the highest risk of malaria.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 3.3: Incidence Hotspot Detection</h3>
+            <p>🔹 <strong>Identify areas with unusually high incidence rates.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Calculate the z-score of incidence rates for each region-year combination.</li>
+                <li>Identify "hotspots" where incidence rates are more than 2 standard deviations above the mean.</li>
+                <li>Create a heatmap visualization highlighting the hotspots over time and space.</li>
+                <li>Generate a report of the top 10 hotspot region-year combinations.</li>
+            </ol>
+            
+        </div>
+        
+        <div class="exercise-section">
+            <h2 id="ex-exporting">4️⃣ Exporting Analysis Results</h2>
+            
+            <h3>Exercise 4.1: Basic Data Export</h3>
+            <p>🔹 <strong>Export your analysis results to different file formats.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Export the annual incidence rate table to a CSV file.</li>
+                <li>Export the regional incidence rates to an Excel file with a properly formatted worksheet.</li>
+                <li>Create separate worksheets in the Excel file for different years.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 4.2: Create a Comprehensive Report</h3>
+            <p>🔹 <strong>Use R Markdown to create a formal report of your findings.</strong></p>
+            
+            <p><strong>Create an R Markdown document that:</strong></p>
+            <ol>
+                <li>Includes an executive summary of key findings.</li>
+                <li>Shows the trend in cases and incidence rates over time with appropriate visualizations.</li>
+                <li>Creates a table of the regions with the highest incidence rates.</li>
+                <li>Includes a section on seasonal patterns observed in the data.</li>
+                <li>Recommends periods and regions for targeted interventions based on your analysis.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 4.3: Automated Reporting</h3>
+            <p>🔹 <strong>Create a parameterized report that can be automatically generated for different regions.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Create a parameterized R Markdown template that accepts a region name as input.</li>
+                <li>Render this template for each region in your dataset.</li>
+                <li>Create a master report that includes summary statistics from all regions.</li>
+            </ol>
+            
+        </div>
+        
+        <hr>
+        
+        <h1 id="solutions4">📌 Week 4: Solutions – Working with Time Series & Basic Aggregation</h1>
+        
+        <p>Here are the <strong>solutions</strong> for Week 4 exercises:</p>
+        
+        <hr>
+        
+        <div class="solution-section">
+            <h2 id="sol-grouping">1️⃣ Data Grouping and Aggregation</h2>
+            
+            <h3>Exercise 1.1: Basic Aggregation</h3>
+            <div class="r-code">
+                <code>
+# Load required packages
+library(dplyr)
+
+# Load the dataset
+malaria_surveillance <- read.csv("malaria_surveillance.csv")
+
+# Calculate total cases per year
+yearly_cases <- malaria_surveillance %>%
+  group_by(year) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(year)
+
+print(yearly_cases)
+
+# Year with highest average monthly cases
+year_avg_cases <- malaria_surveillance %>%
+  group_by(year) %>%
+  summarise(avg_monthly_cases = mean(cases, na.rm = TRUE)) %>%
+  arrange(desc(avg_monthly_cases))
+
+cat("Year with highest average monthly cases:", 
+    year_avg_cases$year[1], "with", 
+    round(year_avg_cases$avg_monthly_cases[1], 2), "cases per month\n")
+
+# Total cases by region across all years
+region_total_cases <- malaria_surveillance %>%
+  group_by(region) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(desc(total_cases))
+
+print(region_total_cases)
+
+# Region with highest case count
+cat("Region with highest total cases:", 
+    region_total_cases$region[1], "with", 
+    region_total_cases$total_cases[1], "cases\n")
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- We use <code>group_by()</code> and <code>summarise()</code> to aggregate data by different variables.<br>
+                - <code>arrange()</code> helps sort the results to quickly identify the highest values.<br>
+                - <code>desc()</code> is used to sort in descending order.<br>
+                - <code>na.rm = TRUE</code> ensures missing values don't affect our calculations.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 1.2: Multi-level Aggregation</h3>
+            <div class="r-code">
+                <code>
+# Summary table of total cases by region and year
+region_year_cases <- malaria_surveillance %>%
+  group_by(region, year) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(region, year)
+
+print(region_year_cases)
+
+# Calculate year-over-year percentage change
+yoy_change <- region_year_cases %>%
+  group_by(region) %>%
+  arrange(region, year) %>%
+  mutate(
+    prev_year_cases = lag(total_cases),
+    yoy_change_pct = ((total_cases - prev_year_cases) / prev_year_cases) * 100
+  ) %>%
+  filter(!is.na(yoy_change_pct))  # Remove first year with no previous data
+
+print(yoy_change)
+
+# Month with highest average cases by region
+monthly_region_cases <- malaria_surveillance %>%
+  group_by(region, month) %>%
+  summarise(avg_cases = mean(cases, na.rm = TRUE), .groups = "drop") %>%
+  group_by(region) %>%
+  filter(avg_cases == max(avg_cases)) %>%
+  arrange(region)
+
+print(monthly_region_cases)
+
+# Rank regions by total cases for each year
+region_ranks <- malaria_surveillance %>%
+  group_by(year, region) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  group_by(year) %>%
+  mutate(rank = rank(-total_cases)) %>%
+  arrange(year, rank)
+
+print(region_ranks)
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Multi-level grouping allows more detailed analysis by combining dimensions.<br>
+                - <code>lag()</code> accesses the previous value in the sequence for year-over-year calculations.<br>
+                - <code>mutate()</code> creates new variables like rank and percentage change.<br>
+                - <code>rank(-total_cases)</code> ranks in descending order (highest cases get rank 1).</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 1.3: Rolling Aggregations</h3>
+            <div class="r-code">
+                <code>
+# Load required packages
+library(zoo)
+library(ggplot2)
+
+# Prepare time series data by date
+ts_data <- malaria_surveillance %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+  group_by(date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(date)
+
+# Calculate 3-month rolling average for each region
+region_rolling_avg <- malaria_surveillance %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+  group_by(region, date) %>%
+  summarise(cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(region, date) %>%
+  group_by(region) %>%
+  mutate(
+    rolling_avg_3m = rollmean(cases, k = 3, fill = NA, align = "right")
+  )
+
+print(head(region_rolling_avg))
+
+# Find 3-month period with highest average cases per year
+rolling_window_max <- malaria_surveillance %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+  group_by(date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(date) %>%
+  mutate(
+    rolling_avg_3m = rollmean(total_cases, k = 3, fill = NA, align = "right"),
+    year = as.integer(format(date, "%Y")),
+    month = as.integer(format(date, "%m"))
+  ) %>%
+  group_by(year) %>%
+  filter(!is.na(rolling_avg_3m)) %>%
+  filter(rolling_avg_3m == max(rolling_avg_3m)) %>%
+  select(year, month, rolling_avg_3m)
+
+print(rolling_window_max)
+
+# Visualize raw cases vs. rolling average
+ggplot(ts_data %>% 
+       mutate(rolling_avg_3m = rollmean(total_cases, k = 3, fill = NA, align = "right"))) +
+  geom_line(aes(x = date, y = total_cases), color = "gray60") +
+  geom_point(aes(x = date, y = total_cases), color = "gray60", size = 1) +
+  geom_line(aes(x = date, y = rolling_avg_3m), color = "red", size = 1.2) +
+  labs(
+    title = "Malaria Cases: Raw Data vs 3-Month Rolling Average",
+    x = "Date",
+    y = "Number of Cases",
+    caption = "Red line shows 3-month rolling average"
+  ) +
+  theme_minimal()
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- <code>rollmean()</code> from the zoo package calculates moving averages over your data.<br>
+                - Setting <code>align = "right"</code> means the average is aligned with the end of the window.<br>
+                - Rolling averages smooth out random fluctuations to reveal underlying trends.<br>
+                - Visualizing both raw data and rolling averages shows the smoothing effect.</p>
+            </div>
+        </div>
+        
+        <div class="solution-section">
+            <h2 id="sol-time-series">2️⃣ Time Series Analysis</h2>
+            
+            <h3>Exercise 2.1: Basic Time Series Visualization</h3>
+            <div class="r-code">
+                <code>
+# Prepare monthly time series data
+monthly_ts <- malaria_surveillance %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+  group_by(date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(date)
+
+# Create a basic line plot
+ggplot(monthly_ts, aes(x = date, y = total_cases)) +
+  geom_line(color = "darkblue") +
+  geom_point(color = "darkblue", size = 1.5) +
+  labs(
+    title = "Monthly Malaria Cases Over Time",
+    x = "Date",
+    y = "Total Cases"
+  ) +
+  theme_minimal()
+
+# Add a trend line
+ggplot(monthly_ts, aes(x = date, y = total_cases)) +
+  geom_line(color = "gray60") +
+  geom_point(color = "gray60", size = 1) +
+  geom_smooth(method = "loess", color = "red", se = TRUE) +
+  labs(
+    title = "Monthly Malaria Cases with Trend Line",
+    x = "Date",
+    y = "Total Cases",
+    caption = "Red line shows smoothed trend with 95% confidence interval"
+  ) +
+  theme_minimal()
+
+# Create time series for top 3 regions
+top_regions <- malaria_surveillance %>%
+  group_by(region) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(desc(total_cases)) %>%
+  head(3) %>%
+  pull(region)
+
+# Create separate plots for top 3 regions
+for(region in top_regions) {
+  region_data <- malaria_surveillance %>%
+    filter(region == !!region) %>%
+    mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+    group_by(date) %>%
+    summarise(total_cases = sum(cases, na.rm = TRUE))
+  
+  p <- ggplot(region_data, aes(x = date, y = total_cases)) +
+    geom_line(color = "darkgreen") +
+    geom_point(color = "darkgreen", size = 1.5) +
+    labs(
+      title = paste("Monthly Malaria Cases in", region),
+      x = "Date",
+      y = "Total Cases"
+    ) +
+    theme_minimal()
+  
+  print(p)
+}
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- We convert year and month to proper dates for time series plotting.<br>
+                - <code>geom_smooth()</code> adds a trend line that helps visualize the overall pattern.<br>
+                - <code>method = "loess"</code> uses local regression for a flexible curve that adapts to the data.<br>
+                - We create separate plots for the top 3 regions to focus on areas with highest burden.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 2.2: Comparative Time Series</h3>
+            <div class="r-code">
+                <code>
+# Create time series by region
+region_ts <- malaria_surveillance %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+  group_by(region, date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(region, date)
+
+# Plot all regions on the same chart
+ggplot(region_ts, aes(x = date, y = total_cases, color = region)) +
+  geom_line() +
+  labs(
+    title = "Malaria Cases Over Time by Region",
+    x = "Date",
+    y = "Total Cases",
+    color = "Region"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+
+# Create faceted plot by region
+ggplot(region_ts, aes(x = date, y = total_cases, color = region)) +
+  geom_line() +
+  facet_wrap(~region, scales = "free_y") +
+  labs(
+    title = "Malaria Cases Over Time by Region",
+    x = "Date",
+    y = "Cases"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Compare seasonal patterns between urban and rural areas
+if("area_type" %in% colnames(malaria_surveillance)) {
+  seasonal_comparison <- malaria_surveillance %>%
+    filter(area_type %in% c("Urban", "Rural")) %>%
+    group_by(area_type, month) %>%
+    summarise(avg_cases = mean(cases, na.rm = TRUE), .groups = "drop") %>%
+    mutate(month_name = month.name[month])
+  
+  ggplot(seasonal_comparison, 
+         aes(x = factor(month), y = avg_cases, 
+             color = area_type, group = area_type)) +
+    geom_line() +
+    geom_point() +
+    scale_x_discrete(labels = month.abb) +
+    labs(
+      title = "Seasonal Pattern of Malaria Cases: Urban vs Rural",
+      x = "Month",
+      y = "Average Cases",
+      color = "Area Type"
+    ) +
+    theme_minimal()
+}
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Using <code>color = region</code> in <code>aes()</code> creates a separate line for each region on the same plot.<br>
+                - <code>facet_wrap(~region)</code> creates a separate panel for each region, making it easier to see individual patterns.<br>
+                - <code>scales = "free_y"</code> allows each panel to have its own y-axis scale, which helps when regions have very different case counts.<br>
+                - Comparing urban and rural seasonal patterns can reveal different transmission dynamics.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 2.3: Time Series Decomposition</h3>
+            <div class="r-code">
+                <code>
+# Create proper time series object
+monthly_counts <- malaria_surveillance %>%
+  group_by(year, month) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(year, month) %>%
+  pull(total_cases)
+
+# Convert to time series object
+ts_data <- ts(monthly_counts, 
+             start = c(min(malaria_surveillance$year), min(malaria_surveillance$month)), 
+             frequency = 12)
+
+# Decompose the time series
+if(length(monthly_counts) >= 24) {  # Need at least 2 years of data
+  ts_decomposition <- decompose(ts_data)
+  
+  # Plot the decomposition
+  plot(ts_decomposition)
+  
+  # Extract components
+  trend <- ts_decomposition$trend
+  seasonal <- ts_decomposition$seasonal
+  random <- ts_decomposition$random
+  
+  # Create a data frame for visualization with ggplot
+  decomp_data <- data.frame(
+    date = seq(as.Date(paste(min(malaria_surveillance$year), 
+                            min(malaria_surveillance$month), "01", sep = "-")), 
+              by = "month", length.out = length(ts_data)),
+    observed = as.numeric(ts_data),
+    trend = as.numeric(trend),
+    seasonal = as.numeric(seasonal),
+    random = as.numeric(random)
+  )
+  
+  # Remove rows with NA (trend component has NAs at the edges)
+  decomp_data <- na.omit(decomp_data)
+  
+  # Visualize the seasonal component
+  ggplot(decomp_data, aes(x = month(date), y = seasonal, group = 1)) +
+    geom_line(color = "blue", size = 1.2) +
+    geom_point(color = "blue", size = 2) +
+    scale_x_continuous(breaks = 1:12, labels = month.abb) +
+    labs(
+      title = "Seasonal Pattern of Malaria Cases",
+      x = "Month",
+      y = "Seasonal Effect"
+    ) +
+    theme_minimal()
+  
+  # Compare actual vs. predicted (trend + seasonal)
+  decomp_data$predicted <- decomp_data$trend + decomp_data$seasonal
+  
+  ggplot(decomp_data) +
+    geom_line(aes(x = date, y = observed, color = "Observed"), size = 0.8) +
+    geom_line(aes(x = date, y = predicted, color = "Predicted"), size = 0.8) +
+    labs(
+      title = "Observed vs. Predicted Malaria Cases",
+      x = "Date",
+      y = "Number of Cases",
+      color = "Series"
+    ) +
+    scale_color_manual(values = c("Observed" = "black", "Predicted" = "red")) +
+    theme_minimal()
+}
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- <code>ts()</code> creates a time series object with <code>frequency = 12</code> for monthly data.<br>
+                - <code>decompose()</code> separates the time series into trend, seasonal, and random components.<br>
+                - The trend component shows the long-term progression of malaria cases.<br>
+                - The seasonal component reveals predictable patterns that repeat each year.<br>
+                - The random component captures unexplained variations that may be due to outbreaks or other factors.</p>
+            </div>
+        </div>
+        
+        <div class="solution-section">
+            <h2 id="sol-incidence">3️⃣ Computing Incidence Rates</h2>
+            
+            <h3>Exercise 3.1: Basic Incidence Calculation</h3>
+            <div class="r-code">
+                <code>
+# Calculate annual incidence rate per 1000 people
+annual_incidence <- malaria_surveillance %>%
+  group_by(year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    incidence_per_1000 = (total_cases / total_population) * 1000
+  ) %>%
+  arrange(year)
+
+print(annual_incidence)
+
+# Calculate regional incidence rates by year
+regional_incidence <- malaria_surveillance %>%
+  group_by(region, year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    incidence_per_1000 = (total_cases / total_population) * 1000,
+    .groups = "drop"
+  ) %>%
+  arrange(year, region)
+
+print(regional_incidence)
+
+# Visualize incidence trend
+ggplot(annual_incidence, aes(x = year, y = incidence_per_1000)) +
+  geom_line(color = "darkblue", size = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Annual Malaria Incidence Rate per 1000 Population",
+    x = "Year",
+    y = "Incidence per 1000"
+  ) +
+  theme_minimal()
+
+# Identify regions with highest/lowest incidence
+region_avg_incidence <- regional_incidence %>%
+  group_by(region) %>%
+  summarise(avg_incidence = mean(incidence_per_1000, na.rm = TRUE)) %>%
+  arrange(desc(avg_incidence))
+
+cat("Region with highest average incidence:", 
+    region_avg_incidence$region[1], 
+    "with", round(region_avg_incidence$avg_incidence[1], 2), 
+    "cases per 1000 people\n")
+
+cat("Region with lowest average incidence:", 
+    region_avg_incidence$region[nrow(region_avg_incidence)], 
+    "with", round(region_avg_incidence$avg_incidence[nrow(region_avg_incidence)], 2), 
+    "cases per 1000 people\n")
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Incidence rates standardize disease burden by population size.<br>
+                - The formula is (number of cases / population) × 1000 for cases per 1000 people.<br>
+                - We calculate incidence at national and regional levels to identify areas of concern.<br>
+                - Visualizing incidence trends helps identify if the disease burden is increasing or decreasing over time.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 3.2: Demographic-Specific Incidence</h3>
+            <div class="r-code">
+                <code>
+# Age-specific incidence rates (if age data available)
+if("age_group" %in% colnames(malaria_surveillance) && 
+   "age_group_population" %in% colnames(malaria_surveillance)) {
+  
+  age_incidence <- malaria_surveillance %>%
+    group_by(age_group) %>%
+    summarise(
+      total_cases = sum(cases, na.rm = TRUE),
+      total_population = sum(age_group_population, na.rm = TRUE),
+      incidence_per_1000 = (total_cases / total_population) * 1000
+    ) %>%
+    arrange(desc(incidence_per_1000))
+  
+  print(age_incidence)
+  
+  # Visualize age-specific incidence
+  ggplot(age_incidence, aes(x = reorder(age_group, -incidence_per_1000), 
+                           y = incidence_per_1000, fill = age_group)) +
+    geom_col() +
+    labs(
+      title = "Malaria Incidence Rate by Age Group",
+      x = "Age Group",
+      y = "Incidence per 1000 Population"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none") +
+    coord_flip()
+}
+
+# Gender-specific incidence rates (if gender data available)
+if("gender" %in% colnames(malaria_surveillance) && 
+   "gender_population" %in% colnames(malaria_surveillance)) {
+  
+  gender_incidence <- malaria_surveillance %>%
+    group_by(gender) %>%
+    summarise(
+      total_cases = sum(cases, na.rm = TRUE),
+      total_population = sum(gender_population, na.rm = TRUE),
+      incidence_per_1000 = (total_cases / total_population) * 1000
+    ) %>%
+    arrange(desc(incidence_per_1000))
+  
+  print(gender_incidence)
+  
+  # Visualize gender-specific incidence
+  ggplot(gender_incidence, aes(x = gender, y = incidence_per_1000, fill = gender)) +
+    geom_col() +
+    labs(
+      title = "Malaria Incidence Rate by Gender",
+      x = "Gender",
+      y = "Incidence per 1000 Population"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+}
+
+# Identify highest risk demographic groups
+# This will depend on what demographic variables are available in your dataset
+# Here's a generic approach that works with multiple demographic variables
+demographic_vars <- intersect(
+  c("age_group", "gender", "area_type", "socioeconomic_status"),
+  colnames(malaria_surveillance)
+)
+
+for(var in demographic_vars) {
+  if(paste0(var, "_population") %in% colnames(malaria_surveillance)) {
+    demo_incidence <- malaria_surveillance %>%
+      group_by_at(var) %>%
+      summarise(
+        total_cases = sum(cases, na.rm = TRUE),
+        total_population = sum(get(paste0(var, "_population")), na.rm = TRUE),
+        incidence_per_1000 = (total_cases / total_population) * 1000,
+        .groups = "drop"
+      ) %>%
+      arrange(desc(incidence_per_1000))
+    
+    cat("\nIncidence rates by", var, ":\n")
+    print(demo_incidence)
+  }
+}
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Demographic-specific incidence helps identify vulnerable subpopulations.<br>
+                - We use conditional code that adapts to whatever demographic variables are available in the dataset.<br>
+                - <code>group_by_at(var)</code> allows grouping by a variable name stored in a character string.<br>
+                - <code>get(paste0(var, "_population"))</code> dynamically accesses population columns based on demographic variables.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 3.3: Incidence Hotspot Detection</h3>
+            <div class="r-code">
+                <code>
+# Calculate z-scores for regional incidence rates
+incidence_z_scores <- regional_incidence %>%
+  group_by(year) %>%
+  mutate(
+    mean_incidence = mean(incidence_per_1000, na.rm = TRUE),
+    sd_incidence = sd(incidence_per_1000, na.rm = TRUE),
+    z_score = (incidence_per_1000 - mean_incidence) / sd_incidence
+  ) %>%
+  ungroup()
+
+# Identify hotspots (Z-score > 2)
+hotspots <- incidence_z_scores %>%
+  filter(z_score > 2) %>%
+  arrange(desc(z_score))
+
+print(hotspots)
+
+# Create a heatmap of Z-scores
+ggplot(incidence_z_scores, aes(x = year, y = region, fill = z_score)) +
+  geom_tile() +
+  scale_fill_gradient2(
+    low = "white", 
+    mid = "yellow",
+    high = "red", 
+    midpoint = 0
+  ) +
+  labs(
+    title = "Malaria Incidence Rate Z-Scores by Region and Year",
+    subtitle = "Red indicates hotspots (Z-score > 2)",
+    x = "Year",
+    y = "Region",
+    fill = "Z-score"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0))
+
+# Top 10 hotspot region-year combinations
+top_hotspots <- incidence_z_scores %>%
+  arrange(desc(z_score)) %>%
+  head(10) %>%
+  select(region, year, incidence_per_1000, z_score)
+
+print(top_hotspots)
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Z-scores standardize values to show how many standard deviations they are from the mean.<br>
+                - A Z-score > 2 indicates that the value is unusually high (top ~2.5% of a normal distribution).<br>
+                - The heatmap visualization makes it easy to spot hotspots across both time and space.<br>
+                - This approach helps prioritize regions for targeted interventions.</p>
+            </div>
+        </div>
+        
+        <div class="solution-section">
+            <h2 id="sol-exporting">4️⃣ Exporting Analysis Results</h2>
+            
+            <h3>Exercise 4.1: Basic Data Export</h3>
+            <div class="r-code">
+                <code>
+# Export annual incidence to CSV
+write.csv(annual_incidence, "annual_malaria_incidence.csv", row.names = FALSE)
+
+# Using readr for more control
+library(readr)
+write_csv(annual_incidence, "annual_malaria_incidence_readr.csv")
+
+# Export regional incidence to Excel
+library(writexl)
+
+# Create an Excel file with regional incidence rates
+write_xlsx(regional_incidence, "regional_malaria_incidence.xlsx")
+
+# Create an Excel file with multiple worksheets for different years
+# First, create a list of data frames for each year
+years <- unique(regional_incidence$year)
+year_data_list <- list()
+
+for(yr in years) {
+  year_data_list[[paste0("Year_", yr)]] <- regional_incidence %>% 
+    filter(year == yr) %>%
+    arrange(desc(incidence_per_1000))
+}
+
+# Add a summary sheet
+year_data_list[["Summary"]] <- regional_incidence %>%
+  group_by(region) %>%
+  summarise(
+    avg_incidence = mean(incidence_per_1000, na.rm = TRUE),
+    min_incidence = min(incidence_per_1000, na.rm = TRUE),
+    max_incidence = max(incidence_per_1000, na.rm = TRUE)
+  ) %>%
+  arrange(desc(avg_incidence))
+
+# Write to Excel with multiple sheets
+write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- <code>write.csv()</code> and <code>write_csv()</code> export data to CSV format.<br>
+                - <code>write_xlsx()</code> from the writexl package exports to Excel format.<br>
+                - Creating a list of data frames allows exporting multiple tables to separate worksheets.<br>
+                - Adding a summary sheet provides a quick overview of the key statistics.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 4.2: Create a Comprehensive Report</h3>
+            <div class="r-code">
+                <code>
+# This code would be saved as an R Markdown (.Rmd) file
+
+# ---
+# title: "Malaria Incidence Analysis Report"
+# author: "Your Name"
+# date: "`r Sys.Date()`"
+# output:
+#   html_document:
+#     toc: true
+#     toc_float: true
+#     theme: united
+#   pdf_document:
+#     toc: true
+# ---
+# 
+# ```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+# library(dplyr)
+# library(ggplot2)
+# library(knitr)
+# library(kableExtra)
+# 
+# # Load your data
+# malaria_surveillance <- read.csv("malaria_surveillance.csv")
+# 
+# # Prepare key datasets for the report
+# annual_incidence <- malaria_surveillance %>%
+#   group_by(year) %>%
+#   summarise(
+#     total_cases = sum(cases, na.rm = TRUE),
+#     total_population = sum(population, na.rm = TRUE),
+#     incidence_per_1000 = (total_cases / total_population) * 1000
+#   )
+# 
+# regional_incidence <- malaria_surveillance %>%
+#   group_by(region, year) %>%
+#   summarise(
+#     total_cases = sum(cases, na.rm = TRUE),
+#     total_population = sum(population, na.rm = TRUE),
+#     incidence_per_1000 = (total_cases / total_population) * 1000,
+#     .groups = "drop"
+#   )
+# 
+# monthly_pattern <- malaria_surveillance %>%
+#   group_by(month) %>%
+#   summarise(avg_cases = mean(cases, na.rm = TRUE)) %>%
+#   mutate(month_name = month.name[month])
+# ```
+# 
+# ## Executive Summary
+# 
+# This report analyzes malaria incidence data across different regions and time periods. Key findings include:
+# 
+# - The overall malaria incidence rate was `r round(mean(annual_incidence$incidence_per_1000), 2)` cases per 1000 population.
+# - `r regional_incidence %>% group_by(region) %>% summarise(avg_inc = mean(incidence_per_1000)) %>% arrange(desc(avg_inc)) %>% pull(region) %>% .[1]` had the highest average incidence rate.
+# - The peak month for malaria cases is typically `r monthly_pattern %>% arrange(desc(avg_cases)) %>% pull(month_name) %>% .[1]`.
+# - There was a `r ifelse(annual_incidence$incidence_per_1000[nrow(annual_incidence)] > annual_incidence$incidence_per_1000[1], "rising", "declining")` trend in incidence rates over the observed period.
+# 
+# ## Temporal Trends in Malaria Incidence
+# 
+# ```{r annual-trend}
+# ggplot(annual_incidence, aes(x = year, y = incidence_per_1000)) +
+#   geom_line(size = 1, color = "blue") +
+#   geom_point(size = 3, color = "blue") +
+#   labs(title = "Annual Malaria Incidence per 1000 Population",
+#        x = "Year", y = "Incidence per 1000") +
+#   theme_minimal()
+# ```
+# 
+# The above figure shows the trend in malaria incidence rates over time. 
+# 
+# ## Regional Comparison
+# 
+# ```{r regional-table}
+# region_summary <- regional_incidence %>%
+#   group_by(region) %>%
+#   summarise(
+#     avg_incidence = mean(incidence_per_1000),
+#     min_incidence = min(incidence_per_1000),
+#     max_incidence = max(incidence_per_1000)
+#   ) %>%
+#   arrange(desc(avg_incidence))
+# 
+# kable(region_summary, 
+#       caption = "Summary of Regional Malaria Incidence (per 1000 population)",
+#       col.names = c("Region", "Average", "Minimum", "Maximum"),
+#       digits = 2) %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+# ```
+# 
+# ```{r regional-heatmap}
+# ggplot(regional_incidence, aes(x = year, y = region, fill = incidence_per_1000)) +
+#   geom_tile() +
+#   scale_fill_gradient(low = "white", high = "red") +
+#   labs(
+#     title = "Heatmap of Malaria Incidence by Region and Year",
+#     x = "Year",
+#     y = "Region",
+#     fill = "Incidence\nper 1000"
+#   ) +
+#   theme_minimal()
+# ```
+# 
+# ## Seasonal Patterns
+# 
+# ```{r seasonal-pattern}
+# ggplot(monthly_pattern, aes(x = factor(month), y = avg_cases, group = 1)) +
+#   geom_line() +
+#   geom_point() +
+#   scale_x_discrete(labels = month.abb) +
+#   labs(
+#     title = "Seasonal Pattern of Malaria Cases",
+#     x = "Month",
+#     y = "Average Number of Cases"
+#   ) +
+#   theme_minimal()
+# ```
+# 
+# The seasonal pattern shows peak malaria transmission during `r monthly_pattern %>% arrange(desc(avg_cases)) %>% head(3) %>% pull(month_name) %>% paste(collapse = ", ")`, which corresponds to the rainy season in many endemic areas.
+# 
+# ## Recommendations for Targeted Interventions
+# 
+# Based on our analysis, we recommend:
+# 
+# 1. **Regional Focus**: Prioritize interventions in `r paste(region_summary$region[1:3], collapse = ", ")`, which have the highest incidence rates.
+# 
+# 2. **Seasonal Timing**: Intensify preventive measures before and during `r monthly_pattern %>% arrange(desc(avg_cases)) %>% head(2) %>% pull(month_name) %>% paste(collapse = " and ")` to address peak transmission periods.
+# 
+# 3. **Monitoring Hotspots**: Establish enhanced surveillance in areas with increasing incidence trends.
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- R Markdown combines code, results, and narrative text in a reproducible document.<br>
+                - YAML header (between --- marks) configures the document settings and output formats.<br>
+                - Code chunks (enclosed in ```{r} and ```) contain R code that produces tables and figures.<br>
+                - Inline R code (enclosed in `r `) dynamically inserts computed values into the text.<br>
+                - The report structure includes an executive summary, findings sections, and actionable recommendations.</p>
+            </div>
+            
+            <hr>
+            
+            <h3>Exercise 4.3: Automated Reporting</h3>
+            <div class="r-code">
+                <code>
+# Create a parameterized report for each region
+# This would be saved as a separate .Rmd file (e.g., regional_report.Rmd)
+
+# ---
+# title: "Malaria Report for `r params$region` Region"
+# params:
+#   region: "Central"
+#   year_range: !r c(2020, 2023)
+#   output_dir: "reports"
+# output: html_document
+# ---
+# 
+# ```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+# library(dplyr)
+# library(ggplot2)
+# 
+# # Load data
+# malaria_surveillance <- read.csv("malaria_surveillance.csv")
+# 
+# # Filter for the specific region
+# region_data <- malaria_surveillance %>%
+#   filter(region == params$region)
+# ```
+# 
+# ## Executive Summary for `r params$region` Region
+# 
+# This report provides an analysis of malaria cases in the `r params$region` region between `r params$year_range[1]` and `r params$year_range[2]`.
+# 
+# ### Key Statistics
+# 
+# ```{r key-stats}
+# region_stats <- region_data %>%
+#   summarize(
+#     total_cases = sum(cases, na.rm = TRUE),
+#     average_monthly_cases = mean(cases, na.rm = TRUE),
+#     total_deaths = sum(deaths, na.rm = TRUE),
+#     cfr = (total_deaths / total_cases) * 100,
+#     avg_incidence = mean((cases/population)*1000, na.rm = TRUE)
+#   )
+# 
+# cat("Total Cases:", format(region_stats$total_cases, big.mark = ","), "\n")
+# cat("Average Monthly Cases:", round(region_stats$average_monthly_cases, 1), "\n")
+# cat("Case Fatality Rate:", round(region_stats$cfr, 2), "%\n")
+# cat("Average Incidence per 1000:", round(region_stats$avg_incidence, 2), "\n")
+# ```
+# 
+# ### Trend Analysis
+# 
+# ```{r trend-plot}
+# region_trend <- region_data %>%
+#   mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
+#   group_by(date) %>%
+#   summarise(cases = sum(cases, na.rm = TRUE))
+# 
+# ggplot(region_trend, aes(x = date, y = cases)) +
+#   geom_line() +
+#   geom_smooth(method = "loess", se = FALSE, color = "red") +
+#   labs(
+#     title = paste("Malaria Cases in", params$region, "Region"),
+#     x = "Date",
+#     y = "Number of Cases"
+#   ) +
+#   theme_minimal()
+# ```
+# 
+# ### Seasonal Pattern
+# 
+# ```{r seasonal}
+# seasonal <- region_data %>%
+#   group_by(month) %>%
+#   summarise(avg_cases = mean(cases, na.rm = TRUE)) %>%
+#   mutate(month_name = month.name[month])
+# 
+# ggplot(seasonal, aes(x = factor(month), y = avg_cases, group = 1)) +
+#   geom_line() +
+#   geom_point() +
+#   scale_x_discrete(labels = month.abb) +
+#   labs(
+#     title = paste("Seasonal Pattern in", params$region, "Region"),
+#     x = "Month",
+#     y = "Average Cases"
+#   ) +
+#   theme_minimal()
+# ```
+# 
+# ## Recommendations
+# 
+# Based on this analysis, we recommend:
+# 
+# 1. Intensify prevention efforts in `r seasonal %>% arrange(desc(avg_cases)) %>% head(1) %>% pull(month_name)`.
+# 2. Focus on areas with population density > 1000 people per sq km.
+# 3. Strengthen case management to reduce the case fatality rate.
+
+# Code to render reports for all regions
+# This would be run in R to generate all the reports
+
+# library(rmarkdown)
+
+# Define the regions and year range
+# regions <- unique(malaria_surveillance$region)
+# year_range <- c(min(malaria_surveillance$year), max(malaria_surveillance$year))
+# output_dir <- "regional_reports"
+# 
+# # Create the output directory if it doesn't exist
+# if(!dir.exists(output_dir)) {
+#   dir.create(output_dir)
+# }
+# 
+# # Generate a report for each region
+# for(region in regions) {
+#   output_file <- file.path(output_dir, paste0("malaria_report_", 
+#                                              gsub(" ", "_", tolower(region)), 
+#                                              ".html"))
+#   
+#   render("regional_report.Rmd", 
+#          output_file = output_file,
+#          params = list(
+#            region = region,
+#            year_range = year_range,
+#            output_dir = output_dir
+#          ))
+#   
+#   cat("Generated report for", region, "\n")
+# }
+# 
+# # Generate a master report that summarizes all regions
+# render("master_report.Rmd",
+#        output_file = file.path(output_dir, "master_malaria_report.html"),
+#        params = list(
+#          regions = regions,
+#          year_range = year_range,
+#          output_dir = output_dir
+#        ))
+                </code>
+            </div>
+            
+            <div class="explanation">
+                <h4>Explanation:</h4>
+                <p>- Parameterized reports allow creating customized reports for different regions or time periods.<br>
+                - <code>params</code> in the YAML header define variables that can be changed when rendering.<br>
+                - <code>render()</code> function can be used in a loop to generate reports for multiple regions.<br>
+                - This approach is extremely valuable for creating consistent reports for different stakeholders or geographic areas.</p>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <h2>💡 What's Next?</h2>
+        <p>✔ After completing Week 4, you have learned to analyze time-based malaria data, calculate standardized incidence rates, and create automated reports.<br>
+        ✔ In <strong>Week 5</strong>, we will explore spatial analysis techniques for mapping malaria distribution and identifying geographic hotspots.</p>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
