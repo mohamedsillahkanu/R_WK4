@@ -61,7 +61,7 @@
         <h3>Step 1: Basic Aggregation with dplyr</h3>
         <div class="r-code">
             <code>
-
+```r
 # Load required packages
 library(dplyr)
 
@@ -78,7 +78,7 @@ yearly_cases <- malaria_data %>%
   )
 
 print(yearly_cases)
-
+```
             </code>
         </div>
         
@@ -94,6 +94,8 @@ print(yearly_cases)
         <h3>Step 2: Multiple Grouping Variables</h3>
         <div class="r-code">
             <code>
+
+```r
 # Group by both year and region
 region_yearly_stats <- malaria_data %>%
   group_by(region, year) %>%
@@ -106,6 +108,7 @@ region_yearly_stats <- malaria_data %>%
   arrange(region, year)
 
 print(region_yearly_stats)
+```
             </code>
         </div>
         
