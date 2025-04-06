@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 4: Working with Time Series & Basic Aggregation for Malaria Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button class="sidebar-toggle" id="sidebar-toggle">Menu</button>
+    
+    <div class="sidebar" id="sidebar">
+        <h3>Course Navigation</h3>
+        <ul>
+            <li class="menu-item">
+                <a href="#week4">📅 Week 4: Time Series & Aggregation</a>
+                <ul class="sub-menu">
+                    <li><a href="#grouping">Data Grouping & Aggregation</a></li>
+                    <li><a href="#time-series">Time Series Analysis</a></li>
+                    <li><a href="#incidence">Computing Incidence Rates</a></li>
+                    <li><a href="#exporting">Exporting Results</a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#exercises4">📌 Week 4: Exercises</a>
+                <ul class="sub-menu">
+                    <li><a href="#ex-grouping">Grouping Exercises</a></li>
+                    <li><a href="#ex-time-series">Time Series Exercises</a></li>
+                    <li><a href="#ex-incidence">Incidence Rate Exercises</a></li>
+                    <li><a href="#ex-exporting">Data Export Exercises</a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#solutions4">📌 Week 4: Solutions</a>
+                <ul class="sub-menu">
+                    <li><a href="#sol-grouping">Grouping Solutions</a></li>
+                    <li><a href="#sol-time-series">Time Series Solutions</a></li>
+                    <li><a href="#sol-incidence">Incidence Solutions</a></li>
+                    <li><a href="#sol-exporting">Export Solutions</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="container">
+        <h1 id="week4">📅 Week 4: Working with Time Series & Basic Aggregation for Malaria Data</h1>
+        
+        <p>This week, we will:<br>
+        ✅ <strong>Group malaria data by year/month</strong> using <code>group_by()</code> and <code>summarise()</code><br>
+        ✅ <strong>Create simple time-series plots</strong> with <code>geom_line()</code> and <code>ts()</code><br>
+        ✅ <strong>Compute malaria incidence rates</strong><br>
+        ✅ <strong>Export results</strong> to CSV and Excel formats</p>
+        
+        <hr>
+        
+        <h2 id="grouping">1️⃣ Grouping and Aggregating Malaria Data</h2>
+        
+        <h3>Why Aggregate Data?</h3>
+        <p>📌 <strong>Aggregation</strong> allows us to summarize data at different levels (e.g., by month, year, region) to identify trends and patterns that may not be visible in raw data.</p>
+        
+        <h3>Step 1: Basic Aggregation with dplyr</h3>
+        <div class="r-code">
+            <code>
+# Load required packages
+library(dplyr)
+
+# Load malaria dataset
+malaria_data <- read.csv("malaria_data.csv")
+
+# Aggregate cases by year
+yearly_cases <- malaria_data %>%
+  group_by(year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    avg_cases = mean(cases, na.rm = TRUE),
+    max_cases = max(cases, na.rm = TRUE)
+  )
+
+print(yearly_cases)
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>group_by(year)</code> groups the data by year<br>
+            ✔ <code>summarise()</code> calculates aggregate statistics for each group<br>
+            ✔ <code>na.rm = TRUE</code> ensures that missing values are ignored in calculations</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 2: Multiple Grouping Variables</h3>
+        <div class="r-code">
+            <code>
+# Group by both year and region
+region_yearly_stats <- malaria_data %>%
+  group_by(region, year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    total_deaths = sum(deaths, na.rm = TRUE),
+    cfr = (total_deaths / total_cases) * 100,  # Case fatality rate
+    .groups = "drop"  # This drops the grouping after summarizing
+  ) %>%
+  arrange(region, year)
+
+print(region_yearly_stats)
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>group_by(region, year)</code> creates groups based on combinations of region and year<br>
+            ✔ <code>arrange(region, year)</code> sorts the results by region, then by year<br>
+            ✔ <code>.groups = "drop"</code> is a newer dplyr feature that removes grouping after summarizing</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 3: Monthly Aggregation</h3>
+        <div class="r-code">
+            <code>
+# Create a proper date column
+malaria_data <- malaria_data %>%
+  mutate(date = as.Date(paste(year, month, "01", sep = "-")))
+
+# Aggregate by month across all years
+monthly_pattern <- malaria_data %>%
+  group_by(month) %>%
+  summarise(
+    avg_cases = mean(cases, na.rm = TRUE),
+    total_cases = sum(cases, na.rm = TRUE)
+  ) %>%
+  mutate(month_name = month.name[month])  # Add month names
+
+print(monthly_pattern)
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>mutate(date = ...)</code> creates a proper date column for time series analysis<br>
+            ✔ <code>group_by(month)</code> aggregates all data by month, regardless of year<br>
+            ✔ <code>month.name</code> is an R built-in vector containing month names</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 4: Rolling Aggregations</h3>
+        <div class="r-code">
+            <code>
+# Install and load the zoo package for rolling functions
+install.packages("zoo")
+library(zoo)
+
+# Create time series by date
+time_series <- malaria_data %>%
+  group_by(date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  arrange(date)
+
+# Calculate 3-month rolling average
+time_series$rolling_avg <- rollmean(time_series$total_cases, k = 3, 
+                                   fill = NA, align = "right")
+
+print(head(time_series))
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>zoo</code> package provides functions for working with time series data<br>
+            ✔ <code>rollmean()</code> calculates a moving average over a specified window (k = 3 months)<br>
+            ✔ <code>align = "right"</code> means the average is aligned with the end of the window</p>
+        </div>
+        
+        <hr>
+        
+        <h2 id="time-series">2️⃣ Time Series Analysis for Malaria Data</h2>
+        
+        <h3>Step 1: Simple Time Series Plots with ggplot2</h3>
+        <div class="r-code">
+            <code>
+# Load ggplot2
+library(ggplot2)
+
+# Create a basic time series line plot
+ggplot(time_series, aes(x = date, y = total_cases)) +
+  geom_line(color = "darkblue", size = 1) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Malaria Cases Over Time",
+    x = "Date",
+    y = "Total Cases"
+  ) +
+  theme_minimal()
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>geom_line()</code> connects the data points with a line to show trends<br>
+            ✔ <code>geom_point()</code> adds points to highlight individual observations<br>
+            ✔ Date data on the x-axis automatically creates a time-based scale</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 2: Adding Trend Lines and Smoothing</h3>
+        <div class="r-code">
+            <code>
+# Add a smoothed trend line to the time series
+ggplot(time_series, aes(x = date, y = total_cases)) +
+  geom_line(color = "gray60") +
+  geom_point(color = "gray60", size = 1.5) +
+  geom_smooth(method = "loess", color = "red", se = TRUE) +
+  labs(
+    title = "Malaria Cases Over Time with Trend",
+    x = "Date",
+    y = "Total Cases",
+    caption = "Red line shows smoothed trend with 95% confidence interval"
+  ) +
+  theme_minimal()
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>geom_smooth()</code> adds a smoothed trend line to the plot<br>
+            ✔ <code>method = "loess"</code> uses local regression for smoothing<br>
+            ✔ <code>se = TRUE</code> adds a confidence interval around the trend line</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 3: Comparing Multiple Time Series</h3>
+        <div class="r-code">
+            <code>
+# Create time series by region
+region_time_series <- malaria_data %>%
+  group_by(region, date) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(region, date)
+
+# Plot multiple time series on the same chart
+ggplot(region_time_series, aes(x = date, y = total_cases, color = region)) +
+  geom_line() +
+  labs(
+    title = "Malaria Cases Over Time by Region",
+    x = "Date",
+    y = "Total Cases",
+    color = "Region"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>color = region</code> in <code>aes()</code> creates separate lines for each region<br>
+            ✔ The legend automatically shows which color corresponds to which region<br>
+            ✔ This allows for easy comparison of patterns across different regions</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 4: Using R's ts() Function for Time Series</h3>
+        <div class="r-code">
+            <code>
+# Create a time series object for more advanced analysis
+yearly_ts <- malaria_data %>%
+  group_by(year) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE)) %>%
+  pull(total_cases)
+
+# Convert to a time series object
+ts_data <- ts(yearly_ts, start = min(malaria_data$year), frequency = 1)
+print(ts_data)
+
+# Basic time series plot
+plot(ts_data, main = "Annual Malaria Cases", 
+     xlab = "Year", ylab = "Cases", 
+     type = "o", col = "darkred")
+
+# Decompose the time series (for data with seasonality)
+monthly_ts <- malaria_data %>%
+  group_by(year, month) %>%
+  summarise(total_cases = sum(cases, na.rm = TRUE), .groups = "drop") %>%
+  arrange(year, month) %>%
+  pull(total_cases)
+
+# Convert to a time series with monthly frequency
+monthly_ts_data <- ts(monthly_ts, 
+                     start = c(min(malaria_data$year), min(malaria_data$month)), 
+                     frequency = 12)
+
+# Decompose the time series into trend, seasonal, and random components
+if(length(monthly_ts) >= 24) {  # Need at least 2 years of data
+  decomposed <- decompose(monthly_ts_data)
+  plot(decomposed)
+}
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>ts()</code> creates a time series object for specialized time series analysis<br>
+            ✔ <code>frequency = 12</code> indicates monthly data (12 observations per year)<br>
+            ✔ <code>decompose()</code> separates the time series into trend, seasonal, and random components<br>
+            ✔ This helps identify seasonal patterns in malaria cases</p>
+        </div>
+        
+        <hr>
+        
+        <h2 id="incidence">3️⃣ Computing Malaria Incidence Rates</h2>
+        
+        <h3>Why Calculate Incidence Rates?</h3>
+        <p>📌 <strong>Incidence rates</strong> standardize the number of cases relative to the population, allowing for fair comparisons between regions with different population sizes.</p>
+        
+        <h3>Step 1: Basic Incidence Rate Calculation</h3>
+        <div class="r-code">
+            <code>
+# Calculate annual incidence rate per 1000 people
+annual_incidence <- malaria_data %>%
+  group_by(year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    total_population = sum(population, na.rm = TRUE),
+    incidence_per_1000 = (total_cases / total_population) * 1000
+  )
+
+print(annual_incidence)
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ Incidence rate is calculated as (total cases / population) × 1000<br>
+            ✔ This gives the number of cases per 1000 people in the population<br>
+            ✔ The multiplier (1000) can be adjusted based on the disease prevalence</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 2: Regional Incidence Comparison</h3>
+        <div class="r-code">
+            <code>
+# Calculate incidence rates by region
+regional_incidence <- malaria_data %>%
+  group_by(region, year) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    avg_population = mean(population, na.rm = TRUE),
+    incidence_per_1000 = (total_cases / avg_population) * 1000,
+    .groups = "drop"
+  ) %>%
+  arrange(year, desc(incidence_per_1000))
+
+# Find regions with highest incidence rates
+high_incidence_regions <- regional_incidence %>%
+  group_by(year) %>%
+  slice_max(order_by = incidence_per_1000, n = 3) %>%
+  arrange(year)
+
+print(high_incidence_regions)
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>slice_max()</code> selects rows with the highest values in each group<br>
+            ✔ Here we identify the top 3 regions with highest incidence rates for each year<br>
+            ✔ This helps target interventions to the most affected areas</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 3: Visualizing Incidence Rates</h3>
+        <div class="r-code">
+            <code>
+# Create a heatmap of incidence rates by region and year
+ggplot(regional_incidence, aes(x = year, y = region, fill = incidence_per_1000)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(
+    title = "Malaria Incidence Rate per 1000 Population",
+    x = "Year",
+    y = "Region",
+    fill = "Incidence\nper 1000"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0))
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>geom_tile()</code> creates a heatmap visualization<br>
+            ✔ <code>scale_fill_gradient()</code> maps colors to incidence values (white for low, red for high)<br>
+            ✔ This visualization quickly identifies hotspots across regions and years</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 4: Age-Specific Incidence Rates</h3>
+        <div class="r-code">
+            <code>
+# If we have age-specific data
+age_incidence <- malaria_data %>%
+  group_by(age_group) %>%
+  summarise(
+    total_cases = sum(cases, na.rm = TRUE),
+    population = sum(age_population, na.rm = TRUE),
+    incidence_per_1000 = (total_cases / population) * 1000
+  ) %>%
+  arrange(desc(incidence_per_1000))
+
+# Visualize age-specific incidence
+ggplot(age_incidence, aes(x = age_group, y = incidence_per_1000, fill = age_group)) +
+  geom_col() +
+  labs(
+    title = "Malaria Incidence Rate by Age Group",
+    x = "Age Group",
+    y = "Incidence per 1000 Population"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  coord_flip()  # Horizontal bars for better readability
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ Age-specific incidence rates help identify vulnerable populations<br>
+            ✔ <code>coord_flip()</code> creates horizontal bars for better visualization with longer labels<br>
+            ✔ This information can guide targeted prevention efforts</p>
+        </div>
+        
+        <hr>
+        
+        <h2 id="exporting">4️⃣ Exporting Analysis Results</h2>
+        
+        <h3>Step 1: Exporting to CSV</h3>
+        <div class="r-code">
+            <code>
+# Write the incidence data to a CSV file
+write.csv(regional_incidence, "malaria_regional_incidence.csv", row.names = FALSE)
+
+# More control with readr package
+library(readr)
+write_csv(annual_incidence, "malaria_annual_incidence.csv")
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>write.csv()</code> is base R's function for exporting to CSV<br>
+            ✔ <code>row.names = FALSE</code> prevents adding row numbers as a column<br>
+            ✔ <code>write_csv()</code> from the readr package provides better performance and encoding control</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 2: Exporting to Excel</h3>
+        <div class="r-code">
+            <code>
+# Install and load the writexl package
+install.packages("writexl")
+library(writexl)
+
+# Write to Excel file
+write_xlsx(list(
+  "Annual Incidence" = annual_incidence,
+  "Regional Incidence" = regional_incidence,
+  "High Incidence Regions" = high_incidence_regions
+), path = "malaria_incidence_report.xlsx")
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ <code>write_xlsx()</code> exports data to Excel format<br>
+            ✔ The <code>list()</code> function allows creating multiple sheets in a single Excel file<br>
+            ✔ Each list element becomes a separate worksheet with the provided name</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 3: Exporting Formatted Reports with R Markdown</h3>
+        <div class="r-code">
+            <code>
+# Create an R Markdown report
+# This is the R code you would put in an .Rmd file
+
+# ---
+# title: "Malaria Incidence Analysis Report"
+# author: "Your Name"
+# date: "`r Sys.Date()`"
+# output:
+#   html_document:
+#     toc: true
+#     toc_float: true
+#     theme: united
+#   pdf_document:
+#     toc: true
+#   word_document:
+#     toc: true
+# ---
+# 
+# ```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+# library(dplyr)
+# library(ggplot2)
+# library(knitr)
+# library(kableExtra)
+# 
+# # Load your data and analysis here
+# ```
+# 
+# ## Executive Summary
+# 
+# This report provides an analysis of malaria incidence across regions and time periods.
+# 
+# ## Annual Incidence Trends
+# 
+# ```{r annual-plot}
+# ggplot(annual_incidence, aes(x = year, y = incidence_per_1000)) +
+#   geom_line(size = 1, color = "blue") +
+#   geom_point(size = 3, color = "blue") +
+#   labs(title = "Annual Malaria Incidence per 1000 Population",
+#        x = "Year", y = "Incidence per 1000") +
+#   theme_minimal()
+# ```
+# 
+# ## Regional Comparison
+# 
+# ```{r regional-table}
+# regional_incidence %>%
+#   filter(year == max(year)) %>%
+#   select(region, total_cases, incidence_per_1000) %>%
+#   arrange(desc(incidence_per_1000)) %>%
+#   kable(caption = "Regional Incidence for Most Recent Year",
+#         col.names = c("Region", "Total Cases", "Incidence per 1000"),
+#         digits = 2) %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"))
+# ```
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ R Markdown combines code, results, and narrative text in a single document<br>
+            ✔ <code>kable()</code> and <code>kable_styling()</code> create nicely formatted tables<br>
+            ✔ R Markdown can export to multiple formats (HTML, PDF, Word) from the same source<br>
+            ✔ This is ideal for creating reproducible reports for stakeholders</p>
+        </div>
+        
+        <hr>
+        
+        <h3>Step 4: Automated Reporting with Parameterized Reports</h3>
+        <div class="r-code">
+            <code>
+# Create a parameterized R Markdown report
+# Add parameters to the YAML header:
+
+# ---
+# title: "Malaria Incidence Report"
+# params:
+#   region: "All"
+#   year: 2023
+#   output_file: "malaria_report.html"
+# output: html_document
+# ---
+# 
+# ```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = FALSE)
+# library(dplyr)
+# library(ggplot2)
+# 
+# # Load data
+# malaria_data <- read.csv("malaria_data.csv")
+# 
+# # Filter based on parameters
+# if(params$region != "All") {
+#   malaria_data <- filter(malaria_data, region == params$region)
+# }
+# 
+# data_year <- filter(malaria_data, year == params$year)
+# ```
+# 
+# ## Malaria Incidence Report for `r params$region` Region, `r params$year`
+#
+# ```{r}
+# # Your analysis code here
+# ```
+
+# Run this in R to generate reports for each region
+regions <- unique(malaria_data$region)
+
+for(region in regions) {
+  rmarkdown::render("report_template.Rmd", 
+                   output_file = paste0("report_", region, ".html"),
+                   params = list(region = region, year = 2023))
+}
+            </code>
+        </div>
+        
+        <div class="explanation">
+            <h4>🔍 Explanation:</h4>
+            <p>✔ Parameterized reports allow creating customized reports for different regions or time periods<br>
+            ✔ <code>params</code> in the YAML header define variables that can be changed when rendering<br>
+            ✔ <code>rmarkdown::render()</code> can be used in a loop to generate multiple reports<br>
+            ✔ This is useful for creating region-specific or time-specific reports automatically</p>
+        </div>
+        
+        <hr>
+        
+        <h2>✅ Summary of Week 4</h2>
+        <p>By the end of this week, you should be able to:<br>
+        ✔ <strong>Group and aggregate malaria data</strong> by different dimensions (time, region, etc.)<br>
+        ✔ <strong>Create and interpret time series visualizations</strong> to identify trends<br>
+        ✔ <strong>Calculate and analyze incidence rates</strong> to compare disease burden across populations<br>
+        ✔ <strong>Export analysis results</strong> in various formats for sharing and reporting</p>
+        
+        <hr>
+        
+        <h1 id="exercises4">📌 Week 4: Exercises – Working with Time Series & Basic Aggregation</h1>
+        
+        <p>These exercises will help you practice grouping data, analyzing time series, calculating incidence rates, and exporting your results in various formats.</p>
+        
+        <hr>
+        
+        <div class="exercise-section">
+            <h2 id="ex-grouping">1️⃣ Data Grouping and Aggregation</h2>
+            
+            <h3>Exercise 1.1: Basic Aggregation</h3>
+            <p>🔹 <strong>Using the <code>malaria_surveillance</code> dataset, complete the following tasks:</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Calculate the total number of malaria cases per year.</li>
+                <li>Determine which year had the highest average monthly cases.</li>
+                <li>Calculate the total number of cases by region across all years.</li>
+                <li>Find the region with the highest total case count.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 1.2: Multi-level Aggregation</h3>
+            <p>🔹 <strong>Group the data by multiple variables to create more detailed aggregations.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Create a summary table showing total cases by region and year.</li>
+                <li>Calculate the year-over-year percentage change in cases for each region.</li>
+                <li>Identify which month has the highest average number of cases for each region.</li>
+                <li>Rank regions by total cases for each year.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 1.3: Rolling Aggregations</h3>
+            <p>🔹 <strong>Use the <code>zoo</code> package to calculate rolling statistics.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Calculate a 3-month rolling average of cases for each region.</li>
+                <li>Find the 3-month period with the highest average cases for each year.</li>
+                <li>Create a visualization comparing raw monthly cases with the 3-month rolling average.</li>
+            </ol>
+            
+        </div>
+        
+        <div class="exercise-section">
+            <h2 id="ex-time-series">2️⃣ Time Series Analysis</h2>
+            
+            <h3>Exercise 2.1: Basic Time Series Visualization</h3>
+            <p>🔹 <strong>Create time series plots to visualize malaria trends.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Create a line plot showing monthly malaria cases over time.</li>
+                <li>Add a trend line (using <code>geom_smooth</code>) to identify the overall pattern.</li>
+                <li>Create separate time series plots for the top 3 regions with highest cases.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 2.2: Comparative Time Series</h3>
+            <p>🔹 <strong>Compare malaria trends across different dimensions.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Create a plot showing time series for each region on the same chart (using color).</li>
+                <li>Create a faceted plot showing separate time series for each region.</li>
+                <li>Create a visualization comparing the seasonal pattern of cases between urban and rural areas.</li>
+            </ol>
+            
+            <hr>
+            
+            <h3>Exercise 2.3: Time Series Decomposition</h3>
+            <p>🔹 <strong>Use the <code>ts()</code> function and decomposition methods.</strong></p>
+            
+            <p><strong>Write the R code to:</strong></p>
+            <ol>
+                <li>Create a proper time series object from the monthly malaria data.</li>
+                <li
