@@ -60,7 +60,9 @@
         
         <h3>Step 1: Basic Aggregation with dplyr</h3>
         <div class="r-code">   
-            <pre><code>
+            <code>
+
+# Load the library
 library(dplyr)
 
 # Load malaria dataset
@@ -76,7 +78,8 @@ yearly_cases <- malaria_data %>%
   )
 
 print(yearly_cases)
-            </code></pre>
+
+            </code>
         </div>
         
         <div class="explanation">
@@ -90,7 +93,7 @@ print(yearly_cases)
         
         <h3>Step 2: Multiple Grouping Variables</h3>
         <div class="r-code">
-            <pre><code>
+            <code>
 # Group by both year and region
 region_yearly_stats <- malaria_data %>%
   group_by(region, year) %>%
@@ -103,7 +106,7 @@ region_yearly_stats <- malaria_data %>%
   arrange(region, year)
 
 print(region_yearly_stats)
-            </code></pre>
+            </code>
         </div>
         
         <div class="explanation">
@@ -117,7 +120,7 @@ print(region_yearly_stats)
         
         <h3>Step 3: Monthly Aggregation</h3>
         <div class="r-code">
-            <pre><code>
+            <code>
 # Create a proper date column
 malaria_data <- malaria_data %>%
   mutate(date = as.Date(paste(year, month, "01", sep = "-")))
@@ -132,7 +135,7 @@ monthly_pattern <- malaria_data %>%
   mutate(month_name = month.name[month])  # Add month names
 
 print(monthly_pattern)
-            </code></pre>
+            </code>
         </div>
         
         <div class="explanation">
