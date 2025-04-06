@@ -61,7 +61,6 @@
         <h3>Step 1: Basic Aggregation with dplyr</h3>
         <div class="r-code">   
             <pre><code>
-```r
 # Load required packages
 library(dplyr)
 
@@ -78,7 +77,6 @@ yearly_cases <- malaria_data %>%
   )
 
 print(yearly_cases)
-```
             </code></pre>
         </div>
         
@@ -93,9 +91,7 @@ print(yearly_cases)
         
         <h3>Step 2: Multiple Grouping Variables</h3>
         <div class="r-code">
-            <code>
-
-```r
+            <pre><code>
 # Group by both year and region
 region_yearly_stats <- malaria_data %>%
   group_by(region, year) %>%
@@ -108,8 +104,7 @@ region_yearly_stats <- malaria_data %>%
   arrange(region, year)
 
 print(region_yearly_stats)
-```
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -123,7 +118,7 @@ print(region_yearly_stats)
         
         <h3>Step 3: Monthly Aggregation</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create a proper date column
 malaria_data <- malaria_data %>%
   mutate(date = as.Date(paste(year, month, "01", sep = "-")))
@@ -138,7 +133,7 @@ monthly_pattern <- malaria_data %>%
   mutate(month_name = month.name[month])  # Add month names
 
 print(monthly_pattern)
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -152,7 +147,7 @@ print(monthly_pattern)
         
         <h3>Step 4: Rolling Aggregations</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Install and load the zoo package for rolling functions
 install.packages("zoo")
 library(zoo)
@@ -168,7 +163,7 @@ time_series$rolling_avg <- rollmean(time_series$total_cases, k = 3,
                                    fill = NA, align = "right")
 
 print(head(time_series))
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -184,7 +179,7 @@ print(head(time_series))
         
         <h3>Step 1: Simple Time Series Plots with ggplot2</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Load ggplot2
 library(ggplot2)
 
@@ -198,7 +193,7 @@ ggplot(time_series, aes(x = date, y = total_cases)) +
     y = "Total Cases"
   ) +
   theme_minimal()
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -212,7 +207,7 @@ ggplot(time_series, aes(x = date, y = total_cases)) +
         
         <h3>Step 2: Adding Trend Lines and Smoothing</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Add a smoothed trend line to the time series
 ggplot(time_series, aes(x = date, y = total_cases)) +
   geom_line(color = "gray60") +
@@ -225,7 +220,7 @@ ggplot(time_series, aes(x = date, y = total_cases)) +
     caption = "Red line shows smoothed trend with 95% confidence interval"
   ) +
   theme_minimal()
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -239,7 +234,7 @@ ggplot(time_series, aes(x = date, y = total_cases)) +
         
         <h3>Step 3: Comparing Multiple Time Series</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create time series by region
 region_time_series <- malaria_data %>%
   group_by(region, date) %>%
@@ -257,7 +252,7 @@ ggplot(region_time_series, aes(x = date, y = total_cases, color = region)) +
   ) +
   theme_minimal() +
   theme(legend.position = "right")
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -271,7 +266,7 @@ ggplot(region_time_series, aes(x = date, y = total_cases, color = region)) +
         
         <h3>Step 4: Using R's ts() Function for Time Series</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create a time series object for more advanced analysis
 yearly_ts <- malaria_data %>%
   group_by(year) %>%
@@ -304,7 +299,7 @@ if(length(monthly_ts) >= 24) {  # Need at least 2 years of data
   decomposed <- decompose(monthly_ts_data)
   plot(decomposed)
 }
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -324,7 +319,7 @@ if(length(monthly_ts) >= 24) {  # Need at least 2 years of data
         
         <h3>Step 1: Basic Incidence Rate Calculation</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Calculate annual incidence rate per 1000 people
 annual_incidence <- malaria_data %>%
   group_by(year) %>%
@@ -349,7 +344,7 @@ print(annual_incidence)
         
         <h3>Step 2: Regional Incidence Comparison</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Calculate incidence rates by region
 regional_incidence <- malaria_data %>%
   group_by(region, year) %>%
@@ -368,7 +363,7 @@ high_incidence_regions <- regional_incidence %>%
   arrange(year)
 
 print(high_incidence_regions)
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -382,7 +377,7 @@ print(high_incidence_regions)
         
         <h3>Step 3: Visualizing Incidence Rates</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create a heatmap of incidence rates by region and year
 ggplot(regional_incidence, aes(x = year, y = region, fill = incidence_per_1000)) +
   geom_tile() +
@@ -395,7 +390,7 @@ ggplot(regional_incidence, aes(x = year, y = region, fill = incidence_per_1000))
   ) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 0))
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
