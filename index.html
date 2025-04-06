@@ -60,10 +60,12 @@
         
         <h3>Step 1: Basic Aggregation with dplyr</h3>
         <div class="r-code">   
-            <code>
-library(dplyr) # Load the library
-
-malaria_data <- read.csv("malaria_data.csv") # Load malaria dataset
+            <pre><code>
+# Load the library             
+library(dplyr) 
+                
+# Load malaria dataset
+malaria_data <- read.csv("malaria_data.csv") 
 
 # Aggregate cases by year
 yearly_cases <- malaria_data %>%
@@ -75,7 +77,7 @@ yearly_cases <- malaria_data %>%
   )
 
 print(yearly_cases) # Print 
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
