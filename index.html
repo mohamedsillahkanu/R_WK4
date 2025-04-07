@@ -91,7 +91,7 @@ print(yearly_cases) # Print
         
         <h3>Step 2: Multiple Grouping Variables</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Group by both year and region
 region_yearly_stats <- malaria_data %>%
   group_by(region, year) %>%
@@ -104,7 +104,7 @@ region_yearly_stats <- malaria_data %>%
   arrange(region, year)
 
 print(region_yearly_stats)
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -118,7 +118,7 @@ print(region_yearly_stats)
         
         <h3>Step 3: Monthly Aggregation</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create a proper date column
 malaria_data <- malaria_data %>%
   mutate(date = as.Date(paste(year, month, "01", sep = "-")))
@@ -133,7 +133,7 @@ monthly_pattern <- malaria_data %>%
   mutate(month_name = month.name[month])  # Add month names
 
 print(monthly_pattern)
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -330,7 +330,7 @@ annual_incidence <- malaria_data %>%
   )
 
 print(annual_incidence)
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -404,7 +404,7 @@ ggplot(regional_incidence, aes(x = year, y = region, fill = incidence_per_1000))
         
         <h3>Step 4: Age-Specific Incidence Rates</h3>
         <div class="r-code">
-            <code>
+            <code><pre>
 # If we have age-specific data
 age_incidence <- malaria_data %>%
   group_by(age_group) %>%
@@ -426,7 +426,7 @@ ggplot(age_incidence, aes(x = age_group, y = incidence_per_1000, fill = age_grou
   theme_minimal() +
   theme(legend.position = "none") +
   coord_flip()  # Horizontal bars for better readability
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -442,14 +442,14 @@ ggplot(age_incidence, aes(x = age_group, y = incidence_per_1000, fill = age_grou
         
         <h3>Step 1: Exporting to CSV</h3>
         <div class="r-code">
-            <code>
+            <code><pre>
 # Write the incidence data to a CSV file
 write.csv(regional_incidence, "malaria_regional_incidence.csv", row.names = FALSE)
 
 # More control with readr package
 library(readr)
 write_csv(annual_incidence, "malaria_annual_incidence.csv")
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -463,7 +463,7 @@ write_csv(annual_incidence, "malaria_annual_incidence.csv")
         
         <h3>Step 2: Exporting to Excel</h3>
         <div class="r-code">
-            <code>
+            <code><pre>
 # Install and load the writexl package
 install.packages("writexl")
 library(writexl)
@@ -474,7 +474,7 @@ write_xlsx(list(
   "Regional Incidence" = regional_incidence,
   "High Incidence Regions" = high_incidence_regions
 ), path = "malaria_incidence_report.xlsx")
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -488,7 +488,7 @@ write_xlsx(list(
         
         <h3>Step 3: Exporting Formatted Reports with R Markdown</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create an R Markdown report
 # This is the R code you would put in an .Rmd file
 
@@ -544,7 +544,7 @@ write_xlsx(list(
 #         digits = 2) %>%
 #   kable_styling(bootstrap_options = c("striped", "hover"))
 # ```
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -559,7 +559,7 @@ write_xlsx(list(
         
         <h3>Step 4: Automated Reporting with Parameterized Reports</h3>
         <div class="r-code">
-            <code>
+            <pre><code>
 # Create a parameterized R Markdown report
 # Add parameters to the YAML header:
 
@@ -602,7 +602,7 @@ for(region in regions) {
                    output_file = paste0("report_", region, ".html"),
                    params = list(region = region, year = 2023))
 }
-            </code>
+            </code></pre>
         </div>
         
         <div class="explanation">
@@ -807,7 +807,7 @@ for(region in regions) {
             
             <h3>Exercise 1.1: Basic Aggregation</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Load required packages
 library(dplyr)
 
@@ -844,7 +844,7 @@ print(region_total_cases)
 cat("Region with highest total cases:", 
     region_total_cases$region[1], "with", 
     region_total_cases$total_cases[1], "cases\n")
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -859,7 +859,7 @@ cat("Region with highest total cases:",
             
             <h3>Exercise 1.2: Multi-level Aggregation</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Summary table of total cases by region and year
 region_year_cases <- malaria_surveillance %>%
   group_by(region, year) %>%
@@ -899,7 +899,7 @@ region_ranks <- malaria_surveillance %>%
   arrange(year, rank)
 
 print(region_ranks)
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -914,7 +914,7 @@ print(region_ranks)
             
             <h3>Exercise 1.3: Rolling Aggregations</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Load required packages
 library(zoo)
 library(ggplot2)
@@ -970,7 +970,7 @@ ggplot(ts_data %>%
     caption = "Red line shows 3-month rolling average"
   ) +
   theme_minimal()
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -987,7 +987,7 @@ ggplot(ts_data %>%
             
             <h3>Exercise 2.1: Basic Time Series Visualization</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Prepare monthly time series data
 monthly_ts <- malaria_surveillance %>%
   mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
@@ -1047,7 +1047,7 @@ for(region in top_regions) {
   
   print(p)
 }
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1062,7 +1062,7 @@ for(region in top_regions) {
             
             <h3>Exercise 2.2: Comparative Time Series</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Create time series by region
 region_ts <- malaria_surveillance %>%
   mutate(date = as.Date(paste(year, month, "01", sep = "-"))) %>%
@@ -1117,7 +1117,7 @@ if("area_type" %in% colnames(malaria_surveillance)) {
     ) +
     theme_minimal()
 }
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1132,7 +1132,7 @@ if("area_type" %in% colnames(malaria_surveillance)) {
             
             <h3>Exercise 2.3: Time Series Decomposition</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Create proper time series object
 monthly_counts <- malaria_surveillance %>%
   group_by(year, month) %>%
@@ -1198,7 +1198,7 @@ if(length(monthly_counts) >= 24) {  # Need at least 2 years of data
     scale_color_manual(values = c("Observed" = "black", "Predicted" = "red")) +
     theme_minimal()
 }
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1216,7 +1216,7 @@ if(length(monthly_counts) >= 24) {  # Need at least 2 years of data
             
             <h3>Exercise 3.1: Basic Incidence Calculation</h3>
             <div class="r-code">
-                <code>
+                <code><pre>
 # Calculate annual incidence rate per 1000 people
 annual_incidence <- malaria_surveillance %>%
   group_by(year) %>%
@@ -1268,7 +1268,7 @@ cat("Region with lowest average incidence:",
     region_avg_incidence$region[nrow(region_avg_incidence)], 
     "with", round(region_avg_incidence$avg_incidence[nrow(region_avg_incidence)], 2), 
     "cases per 1000 people\n")
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1283,7 +1283,7 @@ cat("Region with lowest average incidence:",
             
             <h3>Exercise 3.2: Demographic-Specific Incidence</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Age-specific incidence rates (if age data available)
 if("age_group" %in% colnames(malaria_surveillance) && 
    "age_group_population" %in% colnames(malaria_surveillance)) {
@@ -1364,7 +1364,7 @@ for(var in demographic_vars) {
     print(demo_incidence)
   }
 }
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1379,7 +1379,7 @@ for(var in demographic_vars) {
             
             <h3>Exercise 3.3: Incidence Hotspot Detection</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Calculate z-scores for regional incidence rates
 incidence_z_scores <- regional_incidence %>%
   group_by(year) %>%
@@ -1423,7 +1423,7 @@ top_hotspots <- incidence_z_scores %>%
   select(region, year, incidence_per_1000, z_score)
 
 print(top_hotspots)
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1440,7 +1440,7 @@ print(top_hotspots)
             
             <h3>Exercise 4.1: Basic Data Export</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Export annual incidence to CSV
 write.csv(annual_incidence, "annual_malaria_incidence.csv", row.names = FALSE)
 
@@ -1477,7 +1477,7 @@ year_data_list[["Summary"]] <- regional_incidence %>%
 
 # Write to Excel with multiple sheets
 write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1492,7 +1492,7 @@ write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
             
             <h3>Exercise 4.2: Create a Comprehensive Report</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # This code would be saved as an R Markdown (.Rmd) file
 
 # ---
@@ -1622,7 +1622,7 @@ write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
 # 2. **Seasonal Timing**: Intensify preventive measures before and during `r monthly_pattern %>% arrange(desc(avg_cases)) %>% head(2) %>% pull(month_name) %>% paste(collapse = " and ")` to address peak transmission periods.
 # 
 # 3. **Monitoring Hotspots**: Establish enhanced surveillance in areas with increasing incidence trends.
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
@@ -1638,7 +1638,7 @@ write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
             
             <h3>Exercise 4.3: Automated Reporting</h3>
             <div class="r-code">
-                <code>
+                <pre><code>
 # Create a parameterized report for each region
 # This would be saved as a separate .Rmd file (e.g., regional_report.Rmd)
 
@@ -1773,7 +1773,7 @@ write_xlsx(year_data_list, "malaria_incidence_by_year.xlsx")
 #          year_range = year_range,
 #          output_dir = output_dir
 #        ))
-                </code>
+                </code></pre>
             </div>
             
             <div class="explanation">
